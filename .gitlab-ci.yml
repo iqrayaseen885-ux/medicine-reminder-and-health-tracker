@@ -25,7 +25,7 @@ type_check:
   stage: type_check
   script:
     - pip install mypy
-    - mypy app.py --ignore-missing-imports || true
+    - mypy app.py
 
 test:
   stage: test
