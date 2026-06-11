@@ -1,39 +1,46 @@
 # Medicine Reminder and Health Tracker
 
-## Project Overview
+## Overview
 
-Medicine Reminder and Health Tracker is a Streamlit web app for managing medicine reminders and tracking daily health readings.
-
-The app stores data locally in `data.json` and provides a simple health analyzer for temperature, pulse, blood pressure, blood sugar, BMI, water intake, sleep, and mood.
-
-This project is for wellness tracking only. It is not a medical diagnosis tool.
+Medicine Reminder and Health Tracker is a Streamlit-based application that helps users manage medicine schedules and monitor daily health metrics.
 
 ## Features
 
-- Add medicine name, dosage, reminder time, and notes.
-- View real-time medicine due reminders.
-- Mark medicines as taken.
-- Delete saved medicines.
-- Log temperature, pulse, blood pressure, blood sugar, weight, height, water intake, sleep, and mood.
-- Calculate BMI automatically.
-- Analyze latest health data with wellness score, urgent alerts, warnings, and healthy signs.
-- View saved health logs in a table.
-- Display health trend charts.
-- Save data locally in `data.json`.
+- Add medicine reminders
+- Real-time due medicine alerts
+- Mark medicines as taken
+- Delete medicines
+- Track temperature, pulse, blood pressure, blood sugar
+- Track weight, BMI, water intake, sleep, and mood
+- Health analyzer dashboard
+- Health trend visualization
+- Local JSON data storage
+
+## Technology Stack
+
+- Python 3.12
+- Streamlit
+- Pandas
+- Streamlit Auto Refresh
+
+## Project Structure
+
+```text
+app.py
+data.json
+requirements.txt
+.specify/
+specs/
+README.md
+```
 
 ## Installation
 
-Install Python 3, then install the required packages:
+Install Python 3.12, then install the required packages:
 
 ```bash
 pip install -r requirements.txt
 ```
-
-The required packages are:
-
-- `streamlit`
-- `pandas`
-- `streamlit-autorefresh`
 
 ## How to Run
 
