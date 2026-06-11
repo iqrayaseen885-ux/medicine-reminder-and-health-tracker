@@ -1,0 +1,22 @@
+stages:
+  - test
+
+variables:
+  PIP_CACHE_DIR: "$CI_PROJECT_DIR/.cache/pip"
+
+cache:
+  paths:
+    - .cache/pip
+
+python-checks:
+  image: python:3.12
+  stage: test
+  before_script:
+    - python --version
+    - pip install -r requirements.txt
+    - pip install ruff black
+  script:
+    - python -m py_compile app.py
+    - python -m json.tool data.json > /tmp/data-json-check.json
+    - black --check app.py
+    - ruff check app.py
