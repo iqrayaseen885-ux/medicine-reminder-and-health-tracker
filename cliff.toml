@@ -1,0 +1,10 @@
+[changelog]
+header = "# Changelog\n"
+body = """
+All notable changes to this project will be documented here.
+"""
+footer = ""
+
+[git]
+conventional_commits = true
+filter_unconventional = false
