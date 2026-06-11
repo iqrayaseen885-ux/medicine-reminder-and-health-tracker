@@ -9,10 +9,12 @@ stages:
 lint:
   stage: lint
   script:
-    - pip install ruff flake8 pylint
+    - pip install ruff flake8 pylint vulture pyupgrade
     - ruff check .
     - flake8 app.py || true
     - pylint app.py || true
+    - vulture app.py || true
+    - pyupgrade --py312-plus app.py
 
 format:
   stage: format
