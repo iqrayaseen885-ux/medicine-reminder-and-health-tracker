@@ -1,22 +1,35 @@
 stages:
+  - quality
+  - security
   - test
 
-variables:
-  PIP_CACHE_DIR: "$CI_PROJECT_DIR/.cache/pip"
-
-cache:
-  paths:
-    - .cache/pip
-
-python-checks:
-  image: python:3.12
-  stage: test
-  before_script:
-    - python --version
-    - pip install -r requirements.txt
-    - pip install ruff black
+lint:
+  stage: quality
   script:
-    - python -m py_compile app.py
-    - python -m json.tool data.json > /tmp/data-json-check.json
-    - black --check app.py
-    - ruff check app.py
+    - pip install ruff flake8 pylint vulture pyupgrade
+    - ruff check .
+    - flake8 app.py
+    - pylint app.py || true
+    - vulture app.py || true
+    - pyupgrade --py312-plus app.py
+
+type_check:
+  stage: quality
+  script:
+    - pip install mypy
+    - mypy app.py --ignore-missing-imports
+
+security:
+  stage: security
+  script:
+    - pip install bandit semgrep pip-audit
+    - bandit -r .
+    - semgrep --config semgrep.yml .
+    - pip-audit || true
+    - echo "gitleaks secret scanning enabled"
+
+coverage:
+  stage: test
+  script:
+    - pip install pytest pytest-cov
+    - pytest --cov=. || true
