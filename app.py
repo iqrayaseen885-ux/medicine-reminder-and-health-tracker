@@ -102,7 +102,7 @@ def ask_ollama(prompt):
 
 def ask_openai(prompt, api_key):
     try:
-        client = OpenAI(api_key=api_key)
+        client = OpenAI(api_key=api_key.strip())
         response = client.chat.completions.create(
             model="gpt-4o-mini",
             messages=[
@@ -264,7 +264,7 @@ if ai_mode == "BYOK - OpenAI API Key / Tokens":
         type="password",
     )
 
-st_autorefresh(interval=1000, key="real_time_refresh")
+st_autorefresh(interval=30000, key="real_time_refresh")
 
 data = load_data()
 now = datetime.now(APP_TIMEZONE)
@@ -530,6 +530,7 @@ with tab_ai_checker:
         if not symptoms.strip():
             st.error("Please enter your symptoms.")
         else:
+            st.session_state["ai_health_answer"] = ""
             prompt = f"""
             Age: {age}
             Symptoms: {symptoms}
@@ -552,7 +553,14 @@ with tab_ai_checker:
                     else:
                         answer = ask_openai(prompt, api_key)
 
-            st.subheader("AI Health Guidance")
+            st.session_state["ai_health_answer"] = answer
+
+    if st.session_state.get("ai_health_answer"):
+        st.subheader("AI Health Guidance")
+        answer = st.session_state["ai_health_answer"]
+        if answer.startswith("Error:") or answer.startswith("Please enter"):
+            st.error(answer)
+        else:
             st.write(answer)
 
 st.caption(
