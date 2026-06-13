@@ -270,6 +270,7 @@ data = load_data()
 now = datetime.now(APP_TIMEZONE)
 current_time = now.strftime("%H:%M")
 today = now.strftime("%Y-%m-%d")
+default_reminder_time = now.replace(second=0, microsecond=0).time()
 
 st.markdown(
     """
@@ -359,7 +360,11 @@ with tab_medicine:
     with st.form("medicine_form", clear_on_submit=True):
         med_name = st.text_input("Medicine Name")
         dosage = st.text_input("Dosage", placeholder="Example: 1 tablet after food")
-        reminder_time = st.time_input("Reminder Time")
+        reminder_time = st.time_input(
+            "Reminder Time (IST)",
+            value=default_reminder_time,
+            step=timedelta(minutes=1),
+        )
         notes = st.text_area("Notes", placeholder="Example: Take after breakfast")
         submitted = st.form_submit_button("Add Medicine")
 
