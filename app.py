@@ -1,7 +1,7 @@
 import requests
 from openai import OpenAI
 import json
-from datetime import datetime
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
 import pandas as pd
@@ -11,6 +11,7 @@ from streamlit_autorefresh import st_autorefresh
 
 
 DATA_FILE = Path("data.json")
+APP_TIMEZONE = timezone(timedelta(hours=5, minutes=30), name="IST")
 
 
 def default_data():
@@ -266,7 +267,7 @@ if ai_mode == "BYOK - OpenAI API Key / Tokens":
 st_autorefresh(interval=1000, key="real_time_refresh")
 
 data = load_data()
-now = datetime.now()
+now = datetime.now(APP_TIMEZONE)
 current_time = now.strftime("%H:%M")
 today = now.strftime("%Y-%m-%d")
 
@@ -314,7 +315,7 @@ st.markdown(
 )
 
 metric_1, metric_2, metric_3, metric_4 = st.columns(4)
-metric_1.metric("Live Time", now.strftime("%I:%M:%S %p"))
+metric_1.metric("Live Time (IST)", now.strftime("%I:%M:%S %p"))
 metric_2.metric("Today", today)
 metric_3.metric("Medicines", len(data["medicines"]))
 metric_4.metric("Health Logs", len(data["health_logs"]))
