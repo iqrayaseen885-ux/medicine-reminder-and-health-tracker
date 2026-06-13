@@ -39,6 +39,8 @@ http://localhost:8501
 
 When the current time matches a medicine time, the app shows a due reminder.
 
+The app can also play a voice reminder with the medicine name and dosage. If your browser blocks automatic audio, select **Play reminder voice**.
+
 You can also mark a medicine as **Taken** or delete it.
 
 ## Health Tracker

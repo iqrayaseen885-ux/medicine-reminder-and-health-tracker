@@ -10,6 +10,7 @@ The app is designed for simple personal wellness tracking. It stores information
 
 - Add medicine reminders with name, dosage, time, and notes.
 - Show real-time due medicine alerts.
+- Play a voice reminder with the medicine name and dosage when a medicine is due.
 - Mark medicines as taken for the current day.
 - Delete medicines that are no longer needed.
 - Track temperature, pulse, blood pressure, and blood sugar.

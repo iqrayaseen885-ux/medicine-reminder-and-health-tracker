@@ -6,6 +6,7 @@ from pathlib import Path
 
 import pandas as pd
 import streamlit as st
+import streamlit.components.v1 as components
 from streamlit_autorefresh import st_autorefresh
 
 
@@ -38,6 +39,48 @@ def load_data():
 def save_data(data):
     with DATA_FILE.open("w", encoding="utf-8") as file:
         json.dump(data, file, indent=4)
+
+
+def play_voice_reminder(message, component_key):
+    safe_message = json.dumps(message)
+    safe_component_key = json.dumps(component_key)
+    components.html(
+        f"""
+        <div data-reminder-key={safe_component_key}></div>
+        <script>
+        const reminderMessage = {safe_message};
+
+        function playReminder() {{
+            try {{
+                const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                const oscillator = audioContext.createOscillator();
+                const gainNode = audioContext.createGain();
+
+                oscillator.type = "sine";
+                oscillator.frequency.setValueAtTime(880, audioContext.currentTime);
+                gainNode.gain.setValueAtTime(0.08, audioContext.currentTime);
+                oscillator.connect(gainNode);
+                gainNode.connect(audioContext.destination);
+                oscillator.start();
+                oscillator.stop(audioContext.currentTime + 0.35);
+            }} catch (error) {{
+                console.warn("Audio beep could not be played.", error);
+            }}
+
+            if ("speechSynthesis" in window) {{
+                window.speechSynthesis.cancel();
+                const utterance = new SpeechSynthesisUtterance(reminderMessage);
+                utterance.rate = 0.9;
+                utterance.pitch = 1;
+                window.speechSynthesis.speak(utterance);
+            }}
+        }}
+
+        playReminder();
+        </script>
+        """,
+        height=0,
+    )
 
 
 def ask_ollama(prompt):
@@ -283,11 +326,25 @@ due_medicines = [
 ]
 
 if due_medicines:
+    reminder_parts = []
     for medicine in due_medicines:
+        med_name = medicine.get("name", "Medicine")
+        dosage = medicine.get("dosage", "")
+        reminder_parts.append(f"{med_name}, {dosage}".strip(", "))
         st.markdown(
-            f'<div class="notice danger">Due now: {medicine.get("name", "Medicine")} - {medicine.get("dosage", "")}</div>',
+            f'<div class="notice danger">Due now: {med_name} - {dosage}</div>',
             unsafe_allow_html=True,
         )
+
+    reminder_text = f"Medicine reminder. It is time to take {'; '.join(reminder_parts)}."
+    due_reminder_key = f"{today}_{current_time}_{'|'.join(reminder_parts)}"
+
+    if st.session_state.get("last_spoken_due_reminder") != due_reminder_key:
+        st.session_state["last_spoken_due_reminder"] = due_reminder_key
+        play_voice_reminder(reminder_text, f"auto_voice_{due_reminder_key}")
+
+    if st.button("Play reminder voice"):
+        play_voice_reminder(reminder_text, f"manual_voice_{now.strftime('%H%M%S')}")
 else:
     st.markdown('<div class="notice success">No medicine due at this exact minute.</div>', unsafe_allow_html=True)
 
