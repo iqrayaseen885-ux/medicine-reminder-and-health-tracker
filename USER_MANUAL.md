@@ -6,6 +6,8 @@ Medicine Reminder and Health Tracker helps you manage medicine schedules, log he
 
 The app saves information in a local `data.json` file.
 
+The app also includes an AI Health Checker for general guidance. It can use local AI inference with Ollama or BYOK with your own OpenAI API key/tokens.
+
 ## Start the App
 
 1. Install dependencies:
@@ -67,6 +69,17 @@ Open the **Health Analyzer** tab to see:
 - Healthy signs.
 - Health log table.
 - Trend charts.
+
+## AI Health Checker
+
+Use the sidebar **AI Settings** area to choose an AI mode:
+
+- **Local AI - Ollama**: start Ollama first with `ollama run llama3`.
+- **BYOK - OpenAI API Key / Tokens**: enter your own OpenAI credential in the sidebar password field.
+
+Open the **AI Health Checker** tab, enter your age and symptoms, then select **Check Health**.
+
+The AI response gives general possible reasons, basic care tips, warning signs, and when to consult a doctor. It does not provide a final diagnosis.
 
 ## Data Storage
 

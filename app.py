@@ -1,3 +1,5 @@
+import requests
+from openai import OpenAI
 import json
 from datetime import datetime
 from pathlib import Path
@@ -36,6 +38,40 @@ def load_data():
 def save_data(data):
     with DATA_FILE.open("w", encoding="utf-8") as file:
         json.dump(data, file, indent=4)
+
+
+def ask_ollama(prompt):
+    try:
+        response = requests.post(
+            "http://localhost:11434/api/generate",
+            json={
+                "model": "llama3",
+                "prompt": prompt,
+                "stream": False,
+            },
+            timeout=60,
+        )
+        return response.json().get("response", "No response from Ollama.")
+    except Exception:
+        return "Ollama is not running. Please run: ollama run llama3"
+
+
+def ask_openai(prompt, api_key):
+    try:
+        client = OpenAI(api_key=api_key)
+        response = client.chat.completions.create(
+            model="gpt-4o-mini",
+            messages=[
+                {
+                    "role": "system",
+                    "content": "You are a safe health assistant. Give general guidance only. Do not diagnose. Always suggest consulting a doctor for serious symptoms.",
+                },
+                {"role": "user", "content": prompt},
+            ],
+        )
+        return response.choices[0].message.content
+    except Exception as e:
+        return f"Error: {e}"
 
 
 def number_status(value, low, high):
@@ -165,6 +201,25 @@ st.set_page_config(
     layout="wide",
 )
 
+st.sidebar.header("AI Settings")
+
+ai_mode = st.sidebar.selectbox(
+    "Choose AI Mode",
+    ["Local AI - Ollama", "BYOK - OpenAI API Key / Tokens"],
+)
+
+st.sidebar.caption(
+    "Use local inference with Ollama, or bring your own OpenAI API key/tokens."
+)
+
+api_key = ""
+
+if ai_mode == "BYOK - OpenAI API Key / Tokens":
+    api_key = st.sidebar.text_input(
+        "Enter your OpenAI API Key / Token",
+        type="password",
+    )
+
 st_autorefresh(interval=1000, key="real_time_refresh")
 
 data = load_data()
@@ -236,8 +291,8 @@ if due_medicines:
 else:
     st.markdown('<div class="notice success">No medicine due at this exact minute.</div>', unsafe_allow_html=True)
 
-tab_medicine, tab_health, tab_dashboard = st.tabs(
-    ["Medicine Reminder", "Health Tracker", "Health Analyzer"]
+tab_medicine, tab_health, tab_dashboard, tab_ai_checker = st.tabs(
+    ["Medicine Reminder", "Health Tracker", "Health Analyzer", "AI Health Checker"]
 )
 
 with tab_medicine:
@@ -393,6 +448,49 @@ with tab_dashboard:
             st.rerun()
     else:
         st.info("No health logs added yet. Add one in the Health Tracker tab.")
+
+with tab_ai_checker:
+    st.header("🤖 AI Health Checker")
+
+    st.warning(
+        "This gives general health guidance only. It is not a replacement for a doctor."
+    )
+
+    age = st.number_input("Age", min_value=1, max_value=120, value=20)
+
+    symptoms = st.text_area(
+        "Enter your symptoms",
+        placeholder="Example: fever, cough, headache for 2 days",
+    )
+
+    if st.button("Check Health"):
+        if not symptoms.strip():
+            st.error("Please enter your symptoms.")
+        else:
+            prompt = f"""
+            Age: {age}
+            Symptoms: {symptoms}
+
+            Give:
+            1. Possible general reasons
+            2. Basic care tips
+            3. Warning signs
+            4. When to consult a doctor
+
+            Do not give a final diagnosis.
+            """
+
+            with st.spinner("AI is checking..."):
+                if ai_mode == "Local AI - Ollama":
+                    answer = ask_ollama(prompt)
+                else:
+                    if not api_key:
+                        answer = "Please enter your OpenAI API key in the sidebar."
+                    else:
+                        answer = ask_openai(prompt, api_key)
+
+            st.subheader("AI Health Guidance")
+            st.write(answer)
 
 st.caption(
     "This app provides reminders and simple wellness guidance only. It does not diagnose, treat, or replace medical advice."

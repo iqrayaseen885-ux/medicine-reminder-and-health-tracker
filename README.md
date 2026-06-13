@@ -17,6 +17,8 @@ The app is designed for simple personal wellness tracking. It stores information
 - Calculate BMI automatically from height and weight.
 - Show a health analyzer dashboard with wellness score, urgent alerts, warnings, and healthy signs.
 - Visualize health trends with Streamlit charts.
+- Use the AI Health Checker for general, non-diagnostic health guidance.
+- Choose local AI inference with Ollama or BYOK with your own OpenAI API key/tokens.
 - Store data locally in JSON format.
 
 ## Technology Stack
@@ -25,6 +27,8 @@ The app is designed for simple personal wellness tracking. It stores information
 - Streamlit
 - Pandas
 - Streamlit Auto Refresh
+- Ollama-compatible local inference through HTTP
+- OpenAI BYOK support
 - JSON file storage
 
 ## Project Structure
@@ -82,6 +86,16 @@ http://localhost:8501
 4. Mark medicines as taken after use.
 5. Open the **Health Tracker** tab to save daily readings.
 6. Open the **Health Analyzer** tab to review score, warnings, healthy signs, logs, and trend charts.
+7. Open the **AI Health Checker** tab for AI-powered general guidance.
+
+## AI Settings
+
+Use the sidebar to choose the AI mode:
+
+- **Local AI - Ollama**: runs inference locally through Ollama at `http://localhost:11434`. Start it with `ollama run llama3` before using the checker.
+- **BYOK - OpenAI API Key / Tokens**: lets users bring their own OpenAI credential. The key is entered in the sidebar password field and is not saved to `data.json`.
+
+AI guidance is general information only. It must not be treated as a diagnosis.
 
 ## Data Storage
 
